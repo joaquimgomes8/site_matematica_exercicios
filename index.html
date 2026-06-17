@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Matemático</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🧮 Quiz Matemático</h1>
+        
+        <div class="game-area">
+            <div class="question" id="questionDisplay">Clique em "JOGAR" para começar!</div>
+            
+            <div class="input-area" id="inputArea" style="display: none;">
+                <input type="number" id="answerInput" placeholder="Digite sua resposta..." autofocus>
+                <button class="btn btn-confirm" id="confirmBtn">✓ Confirmar</button>
+            </div>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="score-board">
+                <span>Acertos: <strong id="correctCount">0</strong></span>
+                <span>Erros: <strong id="wrongCount">0</strong></span>
+            </div>
+
+            <button class="btn btn-play" id="playBtn">🎮 JOGAR</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
