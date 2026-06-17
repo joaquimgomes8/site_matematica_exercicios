@@ -6,9 +6,12 @@ const feedback = document.getElementById('feedback');
 const correctCount = document.getElementById('correctCount');
 const wrongCount = document.getElementById('wrongCount');
 const inputArea = document.getElementById('inputArea');
+const timerDisplay = document.getElementById('timerDisplay');
 
 let currentAnswer = null;
 let isPlaying = false;
+let timerSeconds = 0;
+let timerInterval = null;
 
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -54,9 +57,37 @@ function generateQuestion() {
     return answer;
 }
 
+function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
+function updateTimer() {
+    timerSeconds++;
+    timerDisplay.textContent = `⏱️ ${formatTime(timerSeconds)}`;
+}
+
+function startTimer() {
+    stopTimer();
+    timerSeconds = 0;
+    timerDisplay.textContent = `⏱️ 00:00`;
+    timerInterval = setInterval(updateTimer, 1000);
+}
+
+function stopTimer() {
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+}
+
 function resetGame() {
     isPlaying = false;
     currentAnswer = null;
+    stopTimer();
+    timerSeconds = 0;
+    timerDisplay.textContent = `⏱️ 00:00`;
     questionDisplay.textContent = 'Clique em "JOGAR" para começar!';
     questionDisplay.classList.remove('active');
     inputArea.style.display = 'none';
@@ -68,6 +99,7 @@ function resetGame() {
 
 function startGame() {
     isPlaying = true;
+    startTimer();
     inputArea.style.display = 'flex';
     playBtn.textContent = '🔄 Próxima';
     feedback.textContent = '';

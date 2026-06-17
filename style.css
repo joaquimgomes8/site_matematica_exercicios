@@ -29,6 +29,18 @@ h1 {
     font-size: 1.8rem;
 }
 
+.timer {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #667eea;
+    background: #f0f4ff;
+    padding: 0.5rem 1.5rem;
+    border-radius: 25px;
+    border: 2px solid #667eea;
+    width: fit-content;
+    margin-bottom: 0.5rem;
+}
+
 .game-area {
     display: flex;
     flex-direction: column;
