@@ -11,11 +11,32 @@
         <h1>🧮 Quiz Matemático</h1>
         
         <div class="game-area">
+            <!-- Difficulty selector (visible before game) -->
             <div class="difficulty-selector" id="difficultySelector">
                 <button class="btn btn-diff btn-diff-easy active" id="diffEasy" data-diff="easy">🟢 Fácil</button>
                 <button class="btn btn-diff btn-diff-moderate" id="diffModerate" data-diff="moderate">🟡 Moderado</button>
                 <button class="btn btn-diff btn-diff-hard" id="diffHard" data-diff="hard">🔴 Difícil</button>
             </div>
+
+            <!-- Timer mode selector (visible before game) -->
+            <div class="timer-mode-selector" id="timerModeSelector">
+                <label class="timer-mode-option">
+                    <input type="radio" name="timerMode" value="withTimer" checked>
+                    <span>⏱️ Com temporizador</span>
+                </label>
+                <label class="timer-mode-option">
+                    <input type="radio" name="timerMode" value="noTimer">
+                    <span>🚫 Sem temporizador</span>
+                </label>
+            </div>
+
+            <!-- Minutes input (visible only when "Com temporizador" is selected) -->
+            <div class="minutes-input-area" id="minutesArea">
+                <label for="minutesInput">Duração (minutos):</label>
+                <input type="number" id="minutesInput" value="2" min="1" max="60">
+            </div>
+
+            <!-- In-game elements -->
             <div class="diff-label" id="diffLabel" style="display: none;"></div>
             <div class="timer" id="timerDisplay" style="display: none;">⏱️ 00:00</div>
             <div class="question" id="questionDisplay">Clique em "JOGAR" para começar!</div>
@@ -27,11 +48,40 @@
 
             <div class="feedback" id="feedback"></div>
 
-            <div class="score-board">
+            <div class="score-board" id="scoreBoard">
                 <span>Acertos: <strong id="correctCount">0</strong></span>
                 <span>Erros: <strong id="wrongCount">0</strong></span>
             </div>
 
+            <!-- Results panel (shown after timer game ends) -->
+            <div class="results-panel" id="resultsPanel" style="display: none;">
+                <div class="results-title">🏆 Fim de Jogo!</div>
+                <div class="results-stats">
+                    <div class="result-item">
+                        <span class="result-label">Dificuldade</span>
+                        <span class="result-value" id="resultDiff">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">⏱️ Tempo</span>
+                        <span class="result-value" id="resultTime">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">✅ Acertos</span>
+                        <span class="result-value correct" id="resultCorrect">0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">❌ Erros</span>
+                        <span class="result-value wrong" id="resultWrong">0</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">📊 Total</span>
+                        <span class="result-value" id="resultTotal">0</span>
+                    </div>
+                </div>
+                <button class="btn btn-back" id="backFromResultsBtn">🔙 VOLTAR</button>
+            </div>
+
+            <!-- Play / Next / Back buttons -->
             <button class="btn btn-play" id="playBtn">🎮 JOGAR</button>
             <button class="btn btn-back" id="backBtn" style="display: none;">🔙 VOLTAR</button>
         </div>

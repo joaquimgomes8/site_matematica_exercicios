@@ -1,3 +1,4 @@
+// --- DOM Elements ---
 const questionDisplay = document.getElementById('questionDisplay');
 const answerInput = document.getElementById('answerInput');
 const confirmBtn = document.getElementById('confirmBtn');
@@ -7,6 +8,8 @@ const correctCount = document.getElementById('correctCount');
 const wrongCount = document.getElementById('wrongCount');
 const inputArea = document.getElementById('inputArea');
 const timerDisplay = document.getElementById('timerDisplay');
+const scoreBoard = document.getElementById('scoreBoard');
+const resultsPanel = document.getElementById('resultsPanel');
 
 const diffEasy = document.getElementById('diffEasy');
 const diffModerate = document.getElementById('diffModerate');
@@ -14,12 +17,26 @@ const diffHard = document.getElementById('diffHard');
 const difficultySelector = document.getElementById('difficultySelector');
 const diffLabel = document.getElementById('diffLabel');
 const backBtn = document.getElementById('backBtn');
+const backFromResultsBtn = document.getElementById('backFromResultsBtn');
 
+const timerModeSelector = document.getElementById('timerModeSelector');
+const minutesArea = document.getElementById('minutesArea');
+const minutesInput = document.getElementById('minutesInput');
+
+const resultDiff = document.getElementById('resultDiff');
+const resultTime = document.getElementById('resultTime');
+const resultCorrect = document.getElementById('resultCorrect');
+const resultWrong = document.getElementById('resultWrong');
+const resultTotal = document.getElementById('resultTotal');
+
+// --- State ---
 let currentAnswer = null;
 let isPlaying = false;
 let timerSeconds = 0;
 let timerInterval = null;
 let currentDifficulty = 'easy';
+let gameOver = false;
+let totalSecondsLimit = 0;    // countdown limit in seconds (0 = no limit)
 
 // --- Difficulty ranges ---
 const DIFFICULTY = {
@@ -49,7 +66,7 @@ const DIFFICULTY = {
     }
 };
 
-// --- Utility functions ---
+// --- Utility ---
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -63,13 +80,39 @@ function formatTime(seconds) {
 // --- Timer ---
 function updateTimer() {
     timerSeconds++;
-    timerDisplay.textContent = `⏱️ ${formatTime(timerSeconds)}`;
+
+    if (totalSecondsLimit > 0) {
+        // Countdown mode
+        const remaining = totalSecondsLimit - timerSeconds;
+        if (remaining <= 0) {
+            timerDisplay.textContent = `⏱️ 00:00`;
+            endGame();
+            return;
+        }
+        timerDisplay.textContent = `⏱️ ${formatTime(remaining)}`;
+        // Warning when less than 30 seconds
+        if (remaining <= 30) {
+            timerDisplay.classList.add('warning');
+        } else {
+            timerDisplay.classList.remove('warning');
+        }
+    } else {
+        // No limit mode (count up)
+        timerDisplay.textContent = `⏱️ ${formatTime(timerSeconds)}`;
+    }
 }
 
 function startTimer() {
     stopTimer();
     timerSeconds = 0;
-    timerDisplay.textContent = `⏱️ 00:00`;
+
+    if (totalSecondsLimit > 0) {
+        timerDisplay.textContent = `⏱️ ${formatTime(totalSecondsLimit)}`;
+        timerDisplay.classList.remove('warning');
+    } else {
+        timerDisplay.textContent = `⏱️ 00:00`;
+    }
+
     timerDisplay.style.display = 'block';
     timerInterval = setInterval(updateTimer, 1000);
 }
@@ -79,17 +122,24 @@ function stopTimer() {
         clearInterval(timerInterval);
         timerInterval = null;
     }
+    timerDisplay.classList.remove('warning');
 }
 
 // --- Difficulty selection ---
 function setDifficulty(diff) {
-    if (isPlaying) return;
-
+    if (isPlaying || gameOver) return;
     currentDifficulty = diff;
-
     [diffEasy, diffModerate, diffHard].forEach(btn => btn.classList.remove('active'));
     document.getElementById(`diff${diff.charAt(0).toUpperCase() + diff.slice(1)}`).classList.add('active');
 }
+
+// --- Timer mode toggle ---
+document.querySelectorAll('input[name="timerMode"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+        const isWithTimer = document.querySelector('input[name="timerMode"]:checked').value === 'withTimer';
+        minutesArea.style.display = isWithTimer ? 'flex' : 'none';
+    });
+});
 
 // --- Question generation ---
 function generateQuestion() {
@@ -141,41 +191,80 @@ function generateQuestion() {
     return answer;
 }
 
-// --- Game state ---
-function resetGame() {
-    isPlaying = false;
-    currentAnswer = null;
-    stopTimer();
-    timerSeconds = 0;
-    timerDisplay.textContent = `⏱️ 00:00`;
-    timerDisplay.style.display = 'none';
-    difficultySelector.style.display = 'flex';
-    diffLabel.style.display = 'none';
-    questionDisplay.textContent = 'Clique em "JOGAR" para começar!';
-    questionDisplay.classList.remove('active');
-    inputArea.style.display = 'none';
-    answerInput.value = '';
-    feedback.textContent = '';
-    feedback.className = 'feedback';
-    playBtn.textContent = '🎮 JOGAR';
-    correctCount.textContent = '0';
-    wrongCount.textContent = '0';
+// --- Show game screen ---
+function showGameScreen() {
+    // Hide setup elements
+    difficultySelector.style.display = 'none';
+    timerModeSelector.style.display = 'none';
+    minutesArea.style.display = 'none';
+    resultsPanel.style.display = 'none';
+
+    // Show game elements
+    diffLabel.style.display = 'block';
+    backBtn.style.display = 'block';
+    inputArea.style.display = 'flex';
+    scoreBoard.style.display = 'flex';
+    playBtn.textContent = '🔄 Próxima';
+    playBtn.style.display = 'inline-block';
 }
 
+// --- Show setup screen ---
+function showSetupScreen() {
+    // Show setup elements
+    difficultySelector.style.display = 'flex';
+    timerModeSelector.style.display = 'flex';
+    const isWithTimer = document.querySelector('input[name="timerMode"]:checked').value === 'withTimer';
+    minutesArea.style.display = isWithTimer ? 'flex' : 'none';
+
+    // Hide game/results elements
+    diffLabel.style.display = 'none';
+    timerDisplay.style.display = 'none';
+    inputArea.style.display = 'none';
+    feedback.textContent = '';
+    feedback.className = 'feedback';
+    scoreBoard.style.display = 'flex';
+    resultsPanel.style.display = 'none';
+    backBtn.style.display = 'none';
+    playBtn.textContent = '🎮 JOGAR';
+    playBtn.style.display = 'inline-block';
+
+    stopTimer();
+    timerSeconds = 0;
+    timerDisplay.textContent = '⏱️ 00:00';
+    questionDisplay.textContent = 'Clique em "JOGAR" para começar!';
+    questionDisplay.classList.remove('active');
+    answerInput.value = '';
+    correctCount.textContent = '0';
+    wrongCount.textContent = '0';
+
+    isPlaying = false;
+    gameOver = false;
+    currentAnswer = null;
+}
+
+// --- Start game ---
 function startGame() {
+    gameOver = false;
     isPlaying = true;
 
-    // Hide difficulty selector, show label with selected difficulty
-    difficultySelector.style.display = 'none';
+    // Determine timer mode
+    const timerMode = document.querySelector('input[name="timerMode"]:checked').value;
+    if (timerMode === 'withTimer') {
+        const minutes = parseInt(minutesInput.value) || 2;
+        if (minutes < 1) minutesInput.value = 1;
+        if (minutes > 60) minutesInput.value = 60;
+        totalSecondsLimit = (parseInt(minutesInput.value) || 2) * 60;
+    } else {
+        totalSecondsLimit = 0; // no limit
+    }
+
     const cfg = DIFFICULTY[currentDifficulty];
     diffLabel.textContent = `${cfg.emoji} ${cfg.label}`;
     diffLabel.className = `diff-label ${currentDifficulty}`;
     diffLabel.style.display = 'block';
 
-    backBtn.style.display = 'block';
+    showGameScreen();
     startTimer();
-    inputArea.style.display = 'flex';
-    playBtn.textContent = '🔄 Próxima';
     feedback.textContent = '';
     feedback.className = 'feedback';
     answerInput.value = '';
@@ -183,29 +272,50 @@ function startGame() {
     answerInput.focus();
 }
 
-function goBack() {
-    if (!isPlaying) return;
+// --- End game (timer finished) ---
+function endGame() {
     stopTimer();
     isPlaying = false;
+    gameOver = true;
     currentAnswer = null;
-    timerSeconds = 0;
-    timerDisplay.textContent = '⏱️ 00:00';
+
+    // Hide game elements
     timerDisplay.style.display = 'none';
-    diffLabel.style.display = 'none';
-    backBtn.style.display = 'none';
-    difficultySelector.style.display = 'flex';
-    questionDisplay.textContent = 'Clique em "JOGAR" para começar!';
-    questionDisplay.classList.remove('active');
     inputArea.style.display = 'none';
-    answerInput.value = '';
+    playBtn.style.display = 'none';
+    backBtn.style.display = 'none';
+    scoreBoard.style.display = 'none';
     feedback.textContent = '';
     feedback.className = 'feedback';
-    playBtn.textContent = '🎮 JOGAR';
-    correctCount.textContent = '0';
-    wrongCount.textContent = '0';
+    diffLabel.style.display = 'none';
+
+    // Show results
+    const correct = parseInt(correctCount.textContent);
+    const wrong = parseInt(wrongCount.textContent);
+    const total = correct + wrong;
+
+    const cfg = DIFFICULTY[currentDifficulty];
+    resultDiff.textContent = `${cfg.emoji} ${cfg.label}`;
+    resultTime.textContent = formatTime(totalSecondsLimit);
+    resultCorrect.textContent = correct;
+    resultWrong.textContent = wrong;
+    resultTotal.textContent = total;
+
+    resultsPanel.style.display = 'block';
+    questionDisplay.textContent = '⏰ Tempo esgotado!';
+    questionDisplay.classList.remove('active');
 }
 
+// --- Go back to setup ---
+function goBack() {
+    if (!isPlaying && !gameOver) return;
+    showSetupScreen();
+}
+
+// --- Check answer ---
 function checkAnswer() {
+    if (!isPlaying || gameOver) return;
+
     const userAnswer = parseFloat(answerInput.value);
 
     if (isNaN(userAnswer)) {
@@ -225,12 +335,13 @@ function checkAnswer() {
     }
 
     setTimeout(() => {
+        if (!isPlaying || gameOver) return;
         generateQuestion();
         answerInput.value = '';
         feedback.textContent = '';
         feedback.className = 'feedback';
         answerInput.focus();
-    }, 1500);
+    }, 1200);
 }
 
 // --- Event Listeners ---
@@ -239,9 +350,10 @@ diffModerate.addEventListener('click', () => setDifficulty('moderate'));
 diffHard.addEventListener('click', () => setDifficulty('hard'));
 
 backBtn.addEventListener('click', goBack);
+backFromResultsBtn.addEventListener('click', goBack);
 
 playBtn.addEventListener('click', () => {
-    if (isPlaying) {
+    if (isPlaying && !gameOver) {
         generateQuestion();
         answerInput.value = '';
         feedback.textContent = '';
@@ -260,5 +372,5 @@ answerInput.addEventListener('keydown', (e) => {
     }
 });
 
-// Initialize
-resetGame();
+// --- Initialize ---
+showSetupScreen();

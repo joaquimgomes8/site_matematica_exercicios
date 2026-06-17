@@ -29,6 +29,14 @@ h1 {
     font-size: 1.8rem;
 }
 
+.game-area {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    align-items: center;
+}
+
+/* --- Difficulty selector --- */
 .difficulty-selector {
     display: flex;
     gap: 0.5rem;
@@ -44,6 +52,8 @@ h1 {
     border: 2px solid transparent;
     opacity: 0.6;
     transition: all 0.3s;
+    cursor: pointer;
+    font-weight: bold;
 }
 
 .btn-diff.active {
@@ -87,6 +97,86 @@ h1 {
     border-color: #dc3545;
 }
 
+/* --- Timer mode selector --- */
+.timer-mode-selector {
+    display: flex;
+    gap: 1rem;
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding: 0.5rem 1rem;
+    background: #f7f7f7;
+    border-radius: 12px;
+    border: 1px solid #eee;
+}
+
+.timer-mode-option {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.95rem;
+    font-weight: bold;
+    color: #555;
+    cursor: pointer;
+    padding: 0.3rem 0.6rem;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.timer-mode-option:hover {
+    background: #eef0ff;
+}
+
+.timer-mode-option input[type="radio"] {
+    accent-color: #667eea;
+    width: 16px;
+    height: 16px;
+}
+
+/* --- Minutes input --- */
+.minutes-input-area {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    color: #555;
+    padding: 0.3rem 0.8rem;
+    background: #f0f4ff;
+    border-radius: 10px;
+    border: 1px solid #d0d8f0;
+}
+
+.minutes-input-area label {
+    font-weight: bold;
+}
+
+.minutes-input-area input {
+    width: 60px;
+    padding: 0.3rem 0.5rem;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    border: 2px solid #667eea;
+    border-radius: 8px;
+    outline: none;
+    color: #333;
+}
+
+.minutes-input-area input:focus {
+    border-color: #764ba2;
+}
+
+/* Remove spinner */
+.minutes-input-area input::-webkit-outer-spin-button,
+.minutes-input-area input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.minutes-input-area input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+/* --- Diff label (in-game) --- */
 .diff-label {
     font-size: 1rem;
     font-weight: bold;
@@ -114,6 +204,7 @@ h1 {
     border: 2px solid #dc3545;
 }
 
+/* --- Timer display --- */
 .timer {
     font-size: 1.2rem;
     font-weight: bold;
@@ -126,13 +217,19 @@ h1 {
     margin-bottom: 0.5rem;
 }
 
-.game-area {
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-    align-items: center;
+.timer.warning {
+    color: #dc3545;
+    border-color: #dc3545;
+    background: #f8d7da;
+    animation: pulse 1s infinite;
 }
 
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* --- Question --- */
 .question {
     font-size: 2.5rem;
     font-weight: bold;
@@ -154,6 +251,7 @@ h1 {
     background: #f0f4ff;
 }
 
+/* --- Input area --- */
 .input-area {
     display: flex;
     gap: 0.8rem;
@@ -186,6 +284,7 @@ h1 {
     -moz-appearance: textfield;
 }
 
+/* --- Buttons --- */
 .btn {
     padding: 0.8rem 1.8rem;
     font-size: 1.1rem;
@@ -238,6 +337,7 @@ h1 {
     background: #218838;
 }
 
+/* --- Feedback --- */
 .feedback {
     font-size: 1.1rem;
     font-weight: bold;
@@ -253,6 +353,7 @@ h1 {
     color: #dc3545;
 }
 
+/* --- Score board --- */
 .score-board {
     display: flex;
     justify-content: center;
@@ -266,4 +367,57 @@ h1 {
 
 .score-board strong {
     color: #333;
+}
+
+/* --- Results panel --- */
+.results-panel {
+    width: 100%;
+    padding: 1rem;
+    background: #f7f7f7;
+    border-radius: 16px;
+    border: 2px solid #e0e0e0;
+}
+
+.results-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 1rem;
+}
+
+.results-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+}
+
+.result-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: white;
+    border-radius: 10px;
+    border: 1px solid #eee;
+}
+
+.result-label {
+    font-size: 0.95rem;
+    color: #666;
+    font-weight: bold;
+}
+
+.result-value {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.result-value.correct {
+    color: #28a745;
+}
+
+.result-value.wrong {
+    color: #dc3545;
 }
