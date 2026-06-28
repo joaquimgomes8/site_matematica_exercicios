@@ -37,6 +37,9 @@ Entre na pasta clonada
 
 Execute: node server.js
 
+<img width="1910" height="892" alt="image" src="https://github.com/user-attachments/assets/42f4b1ea-9720-45b2-ba4e-166f54dc789c" />
+
+
 ## 📌 Melhorias futuras
 
 - Sistema de pontuação
